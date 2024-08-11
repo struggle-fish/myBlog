@@ -5,7 +5,7 @@ import AutoNav from "vite-plugin-vitepress-auto-nav";
 export default defineConfig({
   title: "江小鱼Blog",
   description: "碎片记录",
-  base: '/myBlog/',
+
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
