@@ -3,19 +3,27 @@ import AutoNav from "vite-plugin-vitepress-auto-nav";
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "江小鱼的博客",
-  description: "博客介绍",
+  title: "江小鱼Blog",
+  description: "碎片记录",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
-      { text: 'Home', link: '/' },
+      { text: '', link: '/' },
       { text: 'Examples', link: '/notes/vue/index' }
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
     ]
   },
-
+  markdown: {
+    container: {
+      tipLabel: '提示',
+      warningLabel: '警告',
+      dangerLabel: '危险',
+      infoLabel: '信息',
+      detailsLabel: '详细信息'
+    }
+  },
   vite: {
     plugins:  [
       AutoNav({

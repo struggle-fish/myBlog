@@ -93,3 +93,8 @@ sw.*
 
 # design files
 __docs/
+
+
+.github
+.github/*
+.github/
