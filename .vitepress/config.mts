@@ -4,18 +4,14 @@ import AutoNav from "vite-plugin-vitepress-auto-nav";
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "江小鱼Blog",
-  description: "碎片记录",
+  description: "个人前端技术文档碎片记录",
   base: '/myBlog/',
-  themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
-    nav: [
-      { text: '', link: '/' },
-      { text: 'Examples', link: '/notes/vue/index' }
-    ],
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
-    ]
-  },
+  // 忽略解析部分md文件（默认忽略node_modules），仅打包后生效，被忽略的文件不影响被其他文件导入
+  srcExclude: [
+    "**/(README).md",
+    "(.vitepress|public|images|.guthub|components|snippets)/**/*.md",
+  ],
+  lastUpdated: true,
   markdown: {
     container: {
       tipLabel: '提示',
@@ -27,12 +23,48 @@ export default defineConfig({
   },
   vite: {
     plugins:  [
-      AutoNav({
-        compareFn: (a, b) => {
-          // 按最新提交时间(没有提交记录时为本地文件修改时间)升序排列
-          return (b.options.lastCommitTime || b.options.modifyTime) - (a.options.lastCommitTime || a.options.modifyTime)
-        },
-      }),
+      AutoNav({}),
     ],
-  }
+  },
+  themeConfig: {
+    // https://vitepress.dev/reference/default-theme-config
+    nav: [
+      { text: '首页', link: '/' },
+      { text: '前端积累', link: '/前端积累/index' },
+      { text: '前端算法', link: '/前端算法/vue/index' },
+      { text: '源码学习', link: '/源码学习/index' },
+    ],
+  
+    socialLinks: [
+      { icon: 'github', link: 'https://github.com/struggle-fish/myBlog' }
+    ],
+    outline: "deep",
+    outlineTitle: "目录",
+    docFooter: {
+      prev: "上一篇",
+      next: "下一篇",
+    },
+    lastUpdatedText: "更新时间",
+    externalLinkIcon: true,
+    search: {
+      provider: 'local',
+      options: {
+        translations: {
+          button: {
+            buttonText: '搜索文档'
+          },
+          modal: {
+            displayDetails: '显示详情',
+            noResultsText: '未找到相关结果',
+            resetButtonTitle: '清除',
+            footer: {
+              closeText: '关闭',
+              selectText: '选择',
+              navigateText: '切换'
+            }
+          }
+        }
+      }
+    }
+  },
 })
