@@ -3,23 +3,18 @@
 layout: home
 
 hero:
-  name: "江小鱼的博客2"
-  text: "博客介绍"
-  tagline: My great project tagline
+  name: "江小鱼"
+  text: "个人技术文档"
+
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
-    - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: 随便逛逛
+      link: /前端基础/index
+
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 
+    details: 不要去责怪当年的自己，他当时站在风里也很迷茫~
+
 ---
 
