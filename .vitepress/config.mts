@@ -1,6 +1,6 @@
 import { defineConfig } from 'vitepress'
 import AutoNav from "vite-plugin-vitepress-auto-nav";
-
+import { nav } from './configs/nav';
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "江小鱼Blog",
@@ -23,25 +23,12 @@ export default defineConfig({
   },
   vite: {
     plugins:  [
-      AutoNav({
-        compareFn: (a, b) => {
-          // 按最新提交时间(没有提交记录时为本地文件修改时间)升序排列
-          return (a.options.lastCommitTime || a.options.modifyTime) - (b.options.lastCommitTime || b.options.modifyTime)
-        },
-      }),
+      AutoNav(),
     ],
   },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    nav: [
-      { text: '首页', link: '/' },
-      { text: '前端基础', link: '/前端基础/index' },
-      { text: '前端积累', link: '/前端积累/index' },
-      { text: '前端算法', link: '/前端算法/index' },
-      { text: '源码学习', link: '/源码学习/index' },
-      { text: '其他', link: '/其他/index' },
-    ],
-  
+    nav,
     socialLinks: [
       { icon: 'github', link: 'https://github.com/struggle-fish/myBlog' }
     ],
