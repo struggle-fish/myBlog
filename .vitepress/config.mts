@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
-import AutoNav from "vite-plugin-vitepress-auto-nav";
+import AutoSidebar from 'vite-plugin-vitepress-auto-sidebar';
 import { nav } from './configs/nav';
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -23,7 +23,48 @@ export default defineConfig({
   },
   vite: {
     plugins:  [
-      AutoNav(),
+      AutoSidebar({
+        path: '/',
+        ignoreList: [
+          'node_modules',
+          'github',
+          'vitepress',
+          '.vitepress',
+          '.github',
+        ],
+        collapsed: true,
+        titleFromFile: true,
+        ignoreIndexItem: true,
+        beforeCreateSideBarItems: (fileNames) => {
+          console.log(fileNames)
+          /*
+          [
+            '.DS_Store',
+            '01-第一章',
+            '02-第二章',
+            '03-第三章',
+            '04-第四章',
+            '05-第五章',
+            '目录.md'
+          ]
+          */
+          const sortedFileNames = fileNames.sort((a, b) => {
+            // 假设文件名包含章节编号，如 '01-introduction', '02-getting-started'
+            const numberPattern = /^(\d+)-/;
+            // 使用正则表达式匹配文件名中的数字
+            const matchA = a.match(numberPattern);
+            const matchB = b.match(numberPattern);
+
+            // 如果匹配成功，则解析数字，否则默认为0
+            const numA = matchA ? parseInt(matchA[1], 10) : 0;
+            const numB = matchB ? parseInt(matchB[1], 10) : 0;
+
+            // 根据数字进行排序
+            return numA - numB;
+          });
+          return sortedFileNames; // 返回排序后的文件名列表
+        }
+      })
     ],
   },
   themeConfig: {
