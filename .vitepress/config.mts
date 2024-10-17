@@ -36,7 +36,6 @@ export default defineConfig({
         titleFromFile: true,
         ignoreIndexItem: true,
         beforeCreateSideBarItems: (fileNames) => {
-          console.log(fileNames)
           /*
           [
             '.DS_Store',
