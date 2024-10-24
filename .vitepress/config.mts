@@ -80,25 +80,26 @@ export default defineConfig({
     },
     lastUpdatedText: "更新时间",
     externalLinkIcon: true,
-    search: {
-      provider: 'local',
-      options: {
-        translations: {
-          button: {
-            buttonText: '搜索文档'
-          },
-          modal: {
-            displayDetails: '显示详情',
-            noResultsText: '未找到相关结果',
-            resetButtonTitle: '清除',
-            footer: {
-              closeText: '关闭',
-              selectText: '选择',
-              navigateText: '切换'
-            }
-          }
-        }
-      }
-    }
+    // TODO:暂时去掉搜索，这个功能跟本地重启有点儿冲突
+    // search: {
+    //   provider: 'local',
+    //   options: {
+    //     translations: {
+    //       button: {
+    //         buttonText: '搜索文档'
+    //       },
+    //       modal: {
+    //         displayDetails: '显示详情',
+    //         noResultsText: '未找到相关结果',
+    //         resetButtonTitle: '清除',
+    //         footer: {
+    //           closeText: '关闭',
+    //           selectText: '选择',
+    //           navigateText: '切换'
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
   },
 })
