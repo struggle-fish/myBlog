@@ -37,3 +37,11 @@
   div[class*='language-'].vp-adaptive-theme.line-numbers-mode::before {
   top: -12px;
 }
+
+.vp-code-group div[class*='language-']::before {
+  display: none;
+}
+
+.vp-code-group div[class*='language-'].line-numbers-mode::before {
+  display: none;
+}
