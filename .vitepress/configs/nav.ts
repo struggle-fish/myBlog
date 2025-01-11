@@ -9,5 +9,4 @@ export const nav: DefaultTheme.Config['nav'] = [
 	{ text: '源码学习', link: '/源码学习/index' },
 	{ text: '英语',  link: '/英语/目录' },
 	{ text: 'JAVA',  link: '/JAVA/index' },
-	{ text: '其他',  link: '/其他/index' },
 ]
