@@ -2,7 +2,7 @@
 
 
 ```javascript
-const base64ToFile = (base64, filename = '测试.png', mimeType = 'image/png') => {
+const base64ToFile = (base64, filename, mimeType = 'image/png') => {
     // 去掉头部信息
     const byteString = atob(base64.split(',')[1]);
     
