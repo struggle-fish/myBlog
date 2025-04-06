@@ -1,4 +1,4 @@
-# Maven优势
+# Maven 优势
 
 Maven 是一款用于管理和构建Java项目的工具，是apache旗下的开源项目。
 
