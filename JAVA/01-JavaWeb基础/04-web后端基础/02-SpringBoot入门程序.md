@@ -82,7 +82,7 @@ public class HelloController {
 ![LOGO](/public/image/javapublic/9e21ebbc-24af-4f08-88bd-3ac16bc79110.png)
 
 
-打开浏览器，输入 http://localhost:8080/hello?name=hahah
+打开浏览器，输入 `http://localhost:8080/hello?name=hahah`
 
 
 
