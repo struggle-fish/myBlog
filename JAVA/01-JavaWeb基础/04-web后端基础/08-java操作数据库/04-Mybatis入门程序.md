@@ -122,17 +122,68 @@ class SpringbootMybatisQuickstartApplicationTests {
 
 ## 辅助配置
 
+- **配置SQL提示**
+默认我们在UserMapper接口上加的 `@Select` 注解中编写SQL语句是没有提示的。
+如果想让idea给我们提示对应的SQL语句，
+我们需要在IDEA中配置与MySQL数据库的链接。 
+
+默认我们在UserMapper接口上的 @Select 
+注解中编写SQL语句是没有提示的。如果想让idea给出提示，可以做如下配置：
+
+如果没有生效,尝试使用 `alt + enter` 快捷键。
+
+![LOGO](/public/image/javapublic/2a3de822-f4c5-4ad8-ba43-306030840449.png)
 
 
+配置完成之后，发现SQL语句中的关键字有提示了，但还存在不识别表名(列名)的情况：
+
+![LOGO](/public/image/javapublic/05a083ad-3b2a-484e-bd91-8549a33b921a.png)
+
+- 产生原因：Idea和数据库没有建立连接，不识别表信息
+- 解决方案：在Idea中配置MySQL数据库连接
+
+按照如下方如下方式，来配置当前IDEA关联的MySQL数据库（必须要指定连接的是哪个数据库）。
 
 
+![LOGO](/public/image/javapublic/31f6bb97-14d7-427c-9784-c105eae9723c.png)
+![LOGO](/public/image/javapublic/6d686c89-1427-4efc-8ca1-53a979e2f94f.png)
 
 
+:::tip
+
+注意：该配置的目的，仅仅是为了在编写SQL语句时，
+有语法提示（写错了会报错），不会影响运行，即使不配置也是可以的。
+:::
 
 
+- **配置Mybatis日志输出**
 
 
+默认情况下，在Mybatis中，SQL语句执行时，我们并看不到SQL语句的执行日志。 
+在`application.properties`加入如下配置，即可查看日志： 
 
+
+```java 
+#mybatis的配置
+mybatis.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
+```
+
+
+## JDBC VS  Mybatis
+
+
+JDBC程序的缺点：
+- url、username、password 等相关参数全部硬编码在java代码中。
+- 查询结果的解析、封装比较繁琐。
+- 每一次操作数据库之前，先获取连接，操作完毕之后，关闭连接。 频繁的获取连接、释放连接造成资源浪费。
+
+
+分析了JDBC的缺点之后，我们再来看一下在mybatis中，是如何解决这些问题的：
+- 数据库连接四要素(驱动、链接、用户名、密码)，都配置在springboot默认的配置文件` application.properties`中
+- 查询结果的解析及封装，由mybatis自动完成映射封装，我们无需关注
+- 在mybatis中使用了`数据库连接池技术`，从而避免了频繁的创建连接、销毁连接而带来的资源浪费。
+
+![LOGO](/public/image/javapublic/8089f516-844f-4110-8298-908334c20bd8.png)
 
 
 
