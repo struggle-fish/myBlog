@@ -50,7 +50,8 @@ public class HelloWorld { // 类名
             - 类 (Class)
 
 
-其中 `项目 , 模块, 包,` 都是**文件夹**
+其中 `项目 , 模块, 包,` 都是**文件夹** 对类进行分类管理.
+
 
 ![LOGO](/public/image/javapublic/1639744035432.png)
 
