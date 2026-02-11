@@ -80,7 +80,87 @@
 
 ## 默认情况下，哪些HTML 标签是块级元素，那些是内联元素
 
+### 块元素特点
 
+- 独占一行，默认宽度是父容器的100%
+- 可以设置宽度、高度、内外边距
+- 块级元素内可以包含块级元素和内联元素
+
+
+### 常见块元素
+
+::: code-group
+
+```html [布局结构]
+<div>、<header>、<footer>、<nav>、
+<section>、<article>、<aside>、<main>
+```
+```html [标题]
+<h1> ~ <h6>
+```
+
+```html [段落和文本]
+<p>、<blockquote>、<pre>
+```
+
+```html [列表]
+<ul>、<ol>、<li>、<dl>、<dt>、<dd>
+```
+
+```html [表格和表单]
+<table>、<thead>、<tbody>、<tfoot>、<tr>
+<form>
+```
+:::
+
+
+### 内联元素特点
+
+- 不会独占一行，与其他内联元素同一行显示
+- 高度和宽度由内容决定，无法设置 `width` 和 `height`
+- 只能设置左右外边距，上下边距无效（padding 上下视觉有效但不占空间）
+- 内联元素只能包含文本和其他内联元素
+
+### 常见内联元素
+
+```html
+<span>、<a>、<strong>、<b>、<em>、
+<i>、<small>、<mark>、<del>、
+<ins>、<sub>、<sup>、<label>
+
+```
+
+
+### 内联块元素
+
+- 结合了块元素和内联元素的特点
+- 不独占一行，可以设置宽高和所有边距
+
+
+### 常见内联块元素
+
+```html
+<img>
+<input>
+<button>
+<select>
+<textarea>
+<iframe>
+
+```
+
+### display 属性转化
+
+```css
+/*内联转块*/
+display: block/table 
+
+/*块转内联*/
+display: inline
+
+/*内联转内联块*/
+display: inline-block
+```
 
 
 
