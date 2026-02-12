@@ -4045,7 +4045,19 @@ h1 {
 - **px**：边框、阴影、固定图标
 
 
+### 网页视口高度
 
+```javascript
+
+window.screen.height // 屏幕高度
+
+window.innerHeight // 网页视口高度
+
+document.body.clientHeight // body高度
+
+
+
+```
 
 
 
