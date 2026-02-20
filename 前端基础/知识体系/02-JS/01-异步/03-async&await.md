@@ -1423,7 +1423,6 @@ async 函数中，await 之前的代码同步执行，遇到 await 后：
 ### 第七题
 
 ```js
-script start   async1 start  async2 p1  script end  p2 settimeout
 async function async1() {
   console.log('async1 start')
   await async2() 
@@ -1538,32 +1537,3 @@ async function fn() {
 
 
 
-
-async function async1() {
-  console.log('async1 start')
-  await async2()
-  console.log('async1 end')
-}
-
-async function async2() {
-  console.log('async2')
-}
-
-console.log('script start')
-
-setTimeout(function () {
-  console.log('setTimeout')
-}, 0)
-
-async1()
-
-new Promise(function(resolve) {
-  console.log('promise1')
-  resolve()
-}).then(function() {
-  console.log('promise2')
-})
-
-console.log('script end')
-
-```
