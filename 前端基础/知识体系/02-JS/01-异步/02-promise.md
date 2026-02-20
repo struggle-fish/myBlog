@@ -415,6 +415,37 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 await sleep(1000)
 ```
 
+### 7. then 和 catch 
+
+- **then**：正常执行完返回 resolved（值会传给下一个 then）；then 回调里抛错则返回 rejected（会被后面的 catch 接住）
+
+```js
+// then 正常返回 → resolved，下一个 then 收到 2
+Promise.resolve(1).then(v => v + 1).then(console.log)  // 2
+
+// then 里报错 → 返回 rejected，被 catch 接住
+Promise.resolve(1).then(() => { 
+  throw new Error('err') 
+}).catch(e => console.log(e.message))  // 'err'
+```
+
+- **catch**：正常执行完返回 resolved（错误已处理，链继续）；catch 回调里再抛错则返回 rejected（需要后面再 catch）
+
+```js
+// catch 正常处理 → 返回 resolved，后面的 then 会执行
+Promise.reject('err').catch(e => console.log(e))
+.then(() => console.log('继续'))  // 'err' → '继续'
+
+// catch 里又报错 → 返回 rejected，需要再 catch
+Promise.reject('err').catch(() => { 
+  throw new Error('again')
+}).catch(e => console.log(e.message))  // 'again'
+```
+
+
+
+
+
 
 
 
