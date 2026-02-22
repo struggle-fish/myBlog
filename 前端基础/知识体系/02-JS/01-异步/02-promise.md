@@ -97,197 +97,260 @@ Promise 对象有三个核心部分：
 
 ```js
 class MyPromise {
-  static PENDING   = 'pending';
-  static FULFILLED = 'fulfilled';
-  static REJECTED  = 'rejected';
+  static PENDING = 'pending'
+  static FULFILLED = 'fulfilled'
+  static REJECTED = 'rejected'
+
 
   constructor(executor) {
-    this.state = MyPromise.PENDING;
-    this.value = undefined;
-    this.reason = undefined;
-    this.fulfilledCallbacks = [];
-    this.rejectedCallbacks  = [];
 
-    // 成功时最终落地的动作
-    const fulfill = (value) => {
-      this.state = MyPromise.FULFILLED;
-      this.value = value;
-      this.fulfilledCallbacks.forEach(fn => fn(value));
-      this._clearCallbacks();
-    };
+    // 初始化基础属性
+    this.state = MyPromise.PENDING
+    this.value = undefined
+    this.reason = undefined
 
-    // 失败时最终落地的动作
-    const reject = (reason) => {
-      this.state = MyPromise.REJECTED;
-      this.reason = reason;
-      this.rejectedCallbacks.forEach(fn => fn(reason));
-      this._clearCallbacks();
-    };
+    this.fulfilledCallbacks = []
+    this.rejectedCallbacks = []
 
-    // 包装 resolve，处理 thenable + 循环引用 + 异步
+
     const resolve = (x) => {
-      if (this.state !== MyPromise.PENDING) return;
+      if (this.state !== MyPromise.PENDING) {
+        return
+      }
+
       // 推入微任务队列
-      queueMicrotask(() => {
-        // 再次判断，防止在异步中状态已被改变
-        if (this.state !== MyPromise.PENDING) return;
-
-        // 核心：解析 thenable / promise / 普通值
-        this._resolveValue(x, fulfill, reject);
-      });
-    };
-
-    try {
-      executor(resolve, reject);
-    } catch (err) {
-      reject(err);
+      // 核心：解析 thenable / promise / 普通值
+      queueMicrotask(() => this.#resolve(x))
     }
+
+    const reject = (reason) => {
+      if (this.state !=== MyPromise.PENDING) {
+        return
+      }
+      queueMicrotask(() => this.#reject(reason))
+    }
+
+    // 执行外界传来的 executor
+    try {
+      executor(resolve, reject)
+    } catch (e) {
+      reject(e)
+    }
+
   }
 
-  // 清理回调数组，防止内存泄漏
-  _clearCallbacks() {
-    this.fulfilledCallbacks = [];
-    this.rejectedCallbacks = [];
+  // ------------------------------
+  // 私有方法：内部核心逻辑（外部无法访问）
+  // ------------------------------
+
+  #fulfill(value) {
+    if (this.state !== MyPromise.PENDING) {
+      return
+    }
+    this.state = MyPromise.FULFILLED
+    this.value = value
+    // 这里的fn 是 then 的时候 pending存的
+    this.fulfilledCallbacks.forEach(fn => fn())
+    this.#clearCallbacks()
   }
 
-  /**
-   * 规范 2.3 Resolve Promise
-   * 处理 x 的各种情况：普通值 → thenable → Promise → 自己
-   */
-  _resolveValue(x, fulfill, reject) {
+  #reject(reason) {
+    if (this.state !== MyPromise.PENDING) {
+      return
+    }
+    this.state = MyPromise.REJECTED
+    this.reason = reason
+    // 这里的fn 是 then 的时候 pending存的
+    this.rejectedCallbacks.forEach(fn => fn())
+    this.#clearCallbacks()
+  }
+
+
+  // 处理 x 的各种情况：普通值 → thenable → Promise → 自己
+  #resolve(x) {
     // 禁止循环引用
     if (x === this) {
-      return reject(new TypeError("Cannot resolve promise with itself"));
+      return this.#reject(new TypeError('Chaining cycle detected for promise'));
     }
 
     // 如果已经是自己的 Promise 实例，直接跟随它的状态
     if (x instanceof MyPromise) {
-      x.then(fulfill, reject);
-      return;
+      return x.then(y => this.#resolve(y), r => this.#reject(r))
     }
 
-    // 不是对象/函数 → 普通值，直接 fulfill
-    if (typeof x !== 'object' || x === null) {
-      return fulfill(x);
-    }
 
-    // 尝试获取 then 方法（可能抛错）
-    let then;
-    try {
-      then = x.then;
-    } catch (err) {
-      return reject(err);
-    }
 
-    // 不是函数 → 当普通对象处理
-    if (typeof then !== 'function') {
-      return fulfill(x);
-    }
+    if (typeof x === 'object' && x !== null || typeof x === 'function') {
+      // 尝试获取 then 方法（可能抛错）
+      let then
+      try {
+        then = x.then
+      } catch(e) {
+        return this.#reject(e)
+      }
 
-    // 是 thenable，调用它的 then（防止多次调用）
-    let called = false;
-    try {
-      then.call(
-        x,
-        y => { 
-          if (!called) { 
-            called = true; 
-            this._resolveValue(y, fulfill, reject); 
-          } 
-        },
-        r => { 
-          if (!called) { 
-            called = true; 
-            reject(r); 
-          }
+
+      if (typeof then === 'function') {
+        // 是 thenable，调用它的 then（防止多次调用）
+        let called = false
+        try {
+          then.call( 
+            x,
+            y => {
+              if (called) {
+                return
+              }
+              called = true
+              this.#resolve(y)
+            },
+            r => {
+              if (called) {
+                return
+              }
+              called = true
+              this.#reject(r)
+            }
+          )
+        } catch(e) {
+          if (!called) this.#reject(e)
         }
-      );
-    } catch (err) {
-      if (!called) {
-        reject(err);
+
+        return
       }
     }
+
+
+    // x 是普通值
+    // 不是对象/函数 → 普通值，直接 fulfill
+    this.#fulfill(x)
+
+
   }
 
-  then(onFulfilled, onRejected) {
-    // 提供默认函数（规范要求）
-    const handleFulfill = typeof onFulfilled === 'function'
-      ? onFulfilled
-      : value => value;
+  // 清理回调数组，防止内存泄漏
+  #clearCallbacks() {
+    this.fulfilledCallbacks = []
+    this.rejectedCallbacks = []
+  }
 
-    const handleReject = typeof onRejected === 'function'
-      ? onRejected
-      : reason => { throw reason };
+
+  then(onFulfilled,onRejected) {
+
+    onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : value => value;
+    onRejected = typeof onRejected === 'function' ? onRejected : reason => { throw reason }
+
 
     return new MyPromise((resolve, reject) => {
-      // 已完成 → 异步执行回调
-      const handleFulfilled = () => {
-        queueMicrotask(() => {
-          try {
-            const x = onFulfilled(this.value);
-            resolve(x);  // 交给外层的 resolve 去解析（会调用 _resolveValue）
-          } catch (err) {
-            reject(err);
-          }
-        });
-      };
 
-      const handleRejected = () => {
+      const _handleFulfilled = () => {
         queueMicrotask(() => {
           try {
-            const x = onRejected(this.reason);
-            resolve(x);  // 注意：onRejected 返回值也会 resolve
-          } catch (err) {
-            reject(err);
+            const x = onFulfilled(this.value)
+            resolve(x)
+          } catch(e) {
+            reject(e)
           }
-        });
-      };
+        })
+      }
+
+
+      const _handleRejected = () => {
+        queueMicrotask(() => {
+          try {
+            const x = onRejected(this.reason)
+            resolve(x)
+          } catch(e) {
+            reject(e)
+          }
+        })
+      }
 
       if (this.state === MyPromise.FULFILLED) {
-        handleFulfilled();
+        _handleFulfilled()
       } else if (this.state === MyPromise.REJECTED) {
-        handleRejected();
+        _handleRejected()
       } else {
         // pending → 收集（包装成带 resolve/reject 的函数）
-        this.onFulfilledCallbacks.push(handleFulfilled);
-        this.onRejectedCallbacks.push(handleRejected);
+        this.onFulfilledCallbacks.push(_handleFulfilled)
+        this.onRejectedCallbacks.push(_handleRejected)
       }
-    });
+
+    })
   }
+
 
   catch(onRejected) {
-    return this.then(null, onRejected);
+    return this.then(null, onRejected)
   }
+
 
   finally(onFinally) {
-    if (typeof onFinally !== 'function') return this.then();
-    
     return this.then(
-      value  => MyPromise.resolve(onFinally()).then(() => value),
-      reason => MyPromise.resolve(onFinally()).then(() => { 
-        throw reason;
-      })
-    );
+      value => MyPromise.resolve(onFinally()).then(() => value),
+      reason => MyPromise.resolve(onFinally()).then(() => { throw reason })
+    )
   }
 
+
+  // ------------------------------
+  // 静态方法
+  // ------------------------------
+
   static resolve(value) {
-    // 如果已经是 MyPromise，直接返回
-    if (value instanceof MyPromise) return value;
-    return new MyPromise(resolve => resolve(value));
+    if (value instanceof MyPromise) {
+      return value
+    }
+    return new MyPromise(resolve => resolve(value))
   }
 
   static reject(reason) {
-    return new MyPromise((_, reject) => reject(reason));
+    return new MyPromise((_, reject) => reject(reason))
   }
+
+  // 静态方法：Promise.all
+  // 所有 promise 都 fulfilled → 返回结果数组
+  // 任意一个 rejected → 立即 reject（第一个错误）
+  static all(iterable) {
+    return new MyPromise((resolve, reject) => {
+      const promises = Array.from(iterable);
+      if (promises.length === 0) return resolve([]);
+
+      const results = new Array(promises.length);
+      let completed = 0;
+
+      promises.forEach((item, index) => {
+        // 统一转成 promise（兼容 thenable 和普通值）
+        MyPromise.resolve(item).then(
+          value => {
+            results[index] = value;
+            if (++completed === promises.length) {
+              resolve(results)
+            }
+          },
+          reason => {
+            // 只要有一个失败，立刻 reject
+            reject(reason);
+          }
+        );
+      });
+    });
+  }
+
+  // 静态方法：Promise.race
+  // 谁先 settled（fulfilled 或 rejected） → 就用谁的结果
+  static race(iterable) {
+    return new MyPromise((resolve, reject) => {
+      Array.from(iterable).forEach(item => {
+        MyPromise.resolve(item).then(resolve, reject)
+      })
+    })
+  }
+
 }
 
 
 
-
-
-
 ```
-
 
 要点：
 
