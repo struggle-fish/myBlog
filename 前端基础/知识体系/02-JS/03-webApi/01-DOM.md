@@ -334,8 +334,122 @@ DOM 性能的核心问题 = 重排 + 重绘 + 过多 DOM 操作
 
 
 
+## 什么是DOM树
+
+DOM 树（Document Object Model Tree） 是浏览器将 HTML 文档解析后，在内存中生成的一棵树状结构。
+
+
+HTML 代码（文本）：
+
+```html
+
+<html>
+  <head><title>页面</title></head>
+  <body>
+    <div class="container">
+      <h1>标题</h1>
+      <p>一段文字</p>
+    </div>
+  </body>
+</html>
+
+```
+
+
+浏览器解析后生成的 DOM 树 是这样的：
+
+
+```text
+                  Document
+                     │
+                   html
+                  /    \
+               head     body
+                │        │
+             title      div.container
+                         /           \
+                       h1             p
+
+```
+
+
+- 每个 HTML 标签、文本、注释等都会变成树上的一个节点（Node）
+- 节点之间通过父子、兄弟关系组织成树状结构
+- 这棵树是 JavaScript 操作页面的接口（document.getElementById、querySelector 等都是在操作这棵树）
+
+
+
+## 浏览器渲染页面的过程
+
+浏览器从收到 HTML 到最终显示出页面，大致要经历以下关键步骤：
+
+
+
+1. 解析 HTML → 生成 DOM 树
+
+浏览器边下载边解析 HTML
+
+遇到 `<script>（无 defer/async）会阻塞解析（重要！）`
 
 
 
 
+2. 解析 CSS → 生成 CSSOM 树
+
+CSS 也会被解析成一棵树（CSS Object Model）
+
+CSSOM 和 DOM 是独立的两棵树
+
+
+3. DOM + CSSOM → 生成 Render Tree（渲染树）
+
+浏览器将 DOM 树和 CSSOM 树结合，生成渲染树
+
+渲染树只包含需要显示的节点（display: none 的节点不会出现在渲染树中）
+
+
+4. Layout（布局 / 回流）
+
+计算每个节点在页面上的确切位置和大小
+
+这个过程也叫 Reflow
+
+
+5. Paint（绘制）
+
+把每个节点画到屏幕上（颜色、文字、阴影、边框等）
+
+这个过程也叫 Repaint
+
+
+6. Composite（合成）
+
+现代浏览器最重要的优化步骤
+
+将页面分成多个图层（Layer），分别栅格化，然后合成最终画面
+
+使用 transform、opacity、will-change 等属性可以触发独立合成层，大幅提升性能
+
+
+```text
+HTML 文件
+    ↓
+Parse HTML → DOM Tree
+    ↓
+Parse CSS → CSSOM Tree
+    ↓
+DOM + CSSOM → Render Tree
+    ↓
+Layout (Reflow) → 计算位置和大小
+    ↓
+Paint (Repaint) → 绘制像素
+    ↓
+Composite (合成) → 显示到屏幕
+
+```
+
+
+**DOM 树是浏览器在内存中用树状结构表示 HTML 文档的结果**
+
+**而浏览器的渲染过程就是：解析 HTML 生成 DOM + 解析 CSS 生成 CSSOM → 合并成 Render Tree → 布局（Layout）→ 绘制（Paint）→ 合成（Composite）最终显示到屏幕上的完整流程**
 

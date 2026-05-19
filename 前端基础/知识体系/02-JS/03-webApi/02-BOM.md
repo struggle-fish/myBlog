@@ -67,3 +67,129 @@ window（BOM 的核心对象，所有 BOM API 都挂在 window 下）
 - navigator.geolocation 获取地理位置
 
 
+## 如何识别浏览器的类型
+
+核心：navigator.userAgent 拿到字符串，用关键词 + 排除法区分。
+
+- Chrome：Chrome 且 不是 Edge
+- Edge：Edg / Edge
+- Firefox：Firefox
+- Safari：Safari 且 不含 Chrome
+- IE：MSIE 或 Trident
+
+```js
+
+function getBrowserInfo() {
+  const ua = navigator.userAgent;
+  let browser = "Unknown";
+  let version = "";
+
+  // Edge
+  if (ua.includes("Edg") || ua.includes("Edge")) {
+    browser = "Edge";
+    version = ua.match(/Edg\/([\d.]+)/)?.[1] || "";
+  }
+  // Chrome
+  else if (ua.includes("Chrome") && !ua.includes("Edg")) {
+    browser = "Chrome";
+    version = ua.match(/Chrome\/([\d.]+)/)?.[1] || "";
+  }
+  // Firefox
+  else if (ua.includes("Firefox")) {
+    browser = "Firefox";
+    version = ua.match(/Firefox\/([\d.]+)/)?.[1] || "";
+  }
+  // Safari
+  else if (ua.includes("Safari") && !ua.includes("Chrome")) {
+    browser = "Safari";
+    version = ua.match(/Version\/([\d.]+)/)?.[1] || "";
+  }
+  // IE
+  else if (ua.includes("MSIE") || ua.includes("Trident")) {
+    browser = "IE";
+    version = ua.match(/(MSIE |rv:)([\d.]+)/)?.[2] || "";
+  }
+
+  return { browser, version };
+}
+
+console.log(getBrowserInfo());
+// {browser: "Chrome", version: "125.0.0.0"}
+
+```
+
+
+
+## 分析拆解URL的各部分
+
+URL 一共 7 部分：协议、认证、主机、端口、路径、查询、锚点
+
+最常用 5 部分：协议、主机、端口、路径、参数
+
+
+```js
+
+https://user:pass@www.example.com:8080/path/to/resource?query=hello&sort=desc#section1
+
+协议://用户名:密码@主机名:端口/路径?查询参数#锚点
+
+
+```
+
+### 协议（Protocol）
+- 内容：https
+- 作用：告诉浏览器用什么方式访问（`http/https/ftp/file` 等）
+- 写法：后面必须跟 `://`
+---
+
+### 认证信息（Auth）→ 很少用
+- 用户名：admin
+- 密码：123456
+- 格式：用户名:密码@
+---
+
+### 主机（Host / 域名 / IP）
+- 内容：`www.baidu.com`
+- 作用：服务器地址（域名 或 IP 都可以）
+---
+
+### 端口（Port）
+- 内容：8080
+- 作用：服务器上的服务入口
+- 默认端口可以省略：
+  - http → 80
+  - https → 443
+---
+
+### 路径（Path）
+- 内容：/s/news
+- 作用：服务器上的文件 / 接口位置
+- 以 / 开头
+---
+
+### 查询参数（Query）
+- 内容：wd=js&page=1
+- 开头：?
+- 格式：key=value，多个用 & 连接
+---
+
+### 锚点（Hash / Fragment）
+- 内容：#top
+- 作用：页面内定位
+- 不会发送到服务器，只在浏览器里使用
+
+
+
+```text
+
+https://admin:123456@www.baidu.com:8080/s/news?wd=js&page=1#top
+
+┌协议：https
+┌认证：admin:123456
+┌主机：www.baidu.com
+┌端口：8080
+┌路径：/s/news
+┌查询：wd=js&page=1
+└锚点：top
+
+```
